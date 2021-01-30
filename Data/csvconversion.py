@@ -36,7 +36,7 @@ def main_csv_format(mainArray, name):
    # 744703296903708682,2020-08-16 23:45:01.900000+00:00,ye,
    formattedArray = []
    for i in range(len(mainArray)):
-      newArray = [0] * 5
+      newArray = [""] * 5
       # id, datetime, message, attachment -> name, date, time, message, attachment
       _, time, contents, attach = mainArray[i]
       newArray[0] = name
@@ -83,7 +83,19 @@ def filtered_csv_format(mainArray):
       i += 1
    return formattedArray
 
+def csv_write(filename, array):
+   csvfile = open(filename, 'w', encoding = 'cp437', newline='')
+   with csvfile:
+      writer = csv.writer(csvfile)
+      
+      writer.writerows(array)
+   csvfile.close()
+
 rawLeon, rawKristi, rawLeon2 = filestuff()
 fLeon = main_csv_format(rawLeon, "Leon")
 fKristi = main_csv_format(rawKristi, "Kristi")
 fLeon2 = filtered_csv_format(rawLeon2)
+
+csv_write("data/formattedLeon.csv", fLeon)
+csv_write("data/formattedKristi.csv", fKristi)
+csv_write("data/formattedFilterLeon.csv", fLeon2)
