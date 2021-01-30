@@ -1,0 +1,14 @@
+state = [0] binary 0 leon kristi 1
+date = ""
+
+array = [0,0,0] [name,date,message]
+for each value in array [i]:
+clear array
+if name check true
+  state = 0
+  split into name and date
+  write into date
+elif state = 0
+  arr0 and 1 = [leon02four][date]
+  array[3] = i
+  append array to bigarray
