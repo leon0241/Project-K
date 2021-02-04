@@ -1,3 +1,5 @@
+#Converts default discord data package into modified csv
+
 import csv
 
 def filestuff():
@@ -6,7 +8,7 @@ def filestuff():
    arrContentsKristi = []
    arrContentsLeon2 = []
 
-   names = ["Data/messagesLeon.csv", "Data/messagesKristi.csv"]
+   names = ["Data/rawData/messagesLeon.csv", "Data/rawData/messagesKristi.csv"]
    # Repeats 2 times for leon and kristi
    for i in range(2): 
       # Open file [i]
@@ -24,7 +26,7 @@ def filestuff():
                arrContentsKristi.append(row)
       file.close()
    
-   with open("DAta/filteredLeon.csv", "r", encoding="cp437") as file:
+   with open("Data/rawData/filteredLeon.csv", "r", encoding="cp437") as file:
       rawContents = csv.reader(file, delimiter=",")
       for row in rawContents:
          arrContentsLeon2.append(row)
@@ -96,6 +98,6 @@ fLeon = main_csv_format(rawLeon, "Leon")
 fKristi = main_csv_format(rawKristi, "Kristi")
 fLeon2 = filtered_csv_format(rawLeon2)
 
-csv_write("data/newData/formattedLeon.csv", fLeon)
-csv_write("data/newData/formattedKristi.csv", fKristi)
-csv_write("data/newData/formattedFilterLeon.csv", fLeon2)
+csv_write("Data/formattedLeon.csv", fLeon)
+csv_write("Data/formattedKristi.csv", fKristi)
+csv_write("Data/formattedFilterLeon.csv", fLeon2)
