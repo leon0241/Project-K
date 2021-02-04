@@ -12,6 +12,4 @@ def read_files():
             array.append(row)
       file.close()
 
-def 
-
 read_files()
