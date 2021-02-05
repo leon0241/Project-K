@@ -2,38 +2,6 @@
 
 import csv
 
-def filestuff():
-   # Init 2d arrays
-   arrContentsLeon = []
-   arrContentsKristi = []
-   arrContentsLeon2 = []
-
-   names = ["Data/rawData/messagesLeon.csv", "Data/rawData/messagesKristi.csv"]
-   # Repeats 2 times for leon and kristi
-   for i in range(2): 
-      # Open file [i]
-      with open(names[i], "r", encoding="cp437") as file:
-         rawContents = csv.reader(file, delimiter=",")
-         # If Leon
-         if i == 0:
-            # Append row into 2d array
-            for row in rawContents:
-               arrContentsLeon.append(row)
-         # If Kristi
-         else:
-            # Append row into second 2d array
-            for row in rawContents:
-               arrContentsKristi.append(row)
-      file.close()
-   
-   with open("Data/rawData/filteredLeon.csv", "r", encoding="cp437") as file:
-      rawContents = csv.reader(file, delimiter=",")
-      for row in rawContents:
-         arrContentsLeon2.append(row)
-   file.close()
-
-   return arrContentsLeon, arrContentsKristi, arrContentsLeon2
-
 def main_csv_format(mainArray, name):
    # 744703296903708682,2020-08-16 23:45:01.900000+00:00,ye,
    formattedArray = []
@@ -92,8 +60,3 @@ def csv_write(filename, array):
       
       writer.writerows(array)
    csvfile.close()
-
-rawLeon, rawKristi, rawLeon2 = filestuff()
-fLeon = main_csv_format(rawLeon, "Leon")
-fKristi = main_csv_format(rawKristi, "Kristi")
-fLeon2 = filtered_csv_format(rawLeon2)
