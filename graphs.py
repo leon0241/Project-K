@@ -5,20 +5,29 @@ import plotly.express as px
 import pandas as pd
 import os
 
+graphs = {}
+data = []
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-df = pd.read_csv("../Data/sortedData6M.csv")
+df = pd.read_csv("Data/sortedData6M.csv")
 
 df["Date"] = pd.to_datetime(df["Date"], dayfirst="True")
 df["Time"] = pd.to_timedelta(df["Time"])
 
 
-data1 = df.groupby(["Date", "Name"]).size().reset_index(name="Count")
+temp = df.groupby(["Date", "Name"]).size().reset_index(name="Count")
+data.append(temp)
+#graph1 = px.line(data1, x="Date", y="Count", color="Name")
+graphs["textsPerDay"] = px.line(data[0], x="Date", y="Count", color="Name")
 
-fig = px.line(data1, x="Date", y="Count", color="Name")
-#fig.show()
+temp = df.groupby(["Time"]).size().reset_index(name="Count")
+data.append(temp)
+graphs["timeOfText"] = px.bar(data[1], x="Time", y="Count")
+graphs["timeOfText"].show()
+
 
 app.layout = html.Div(children=[
    html.H1(children="it's a count :D "),
@@ -27,9 +36,9 @@ app.layout = html.Div(children=[
 
    dcc.Graph(
       id="graph",
-      figure = fig
+      figure = graphs["textsPerDay"]
    )
 ])
 
-if __name__ == "__main__":
-   app.run_server(debug=True)
+# if __name__ == "__main__":
+#    app.run_server(debug=True)
