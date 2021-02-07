@@ -15,7 +15,8 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 df = pd.read_csv("Data/sortedData6M.csv")
 
 df["Date"] = pd.to_datetime(df["Date"], dayfirst="True")
-df["Time"] = pd.to_timedelta(df["Time"])
+df["Time"] = df["Time"].str[0:5]
+#df["Time"] = pd.to_datetime(("21/12/2016 " + df["Time"]), format="%d/%m/%Y %H:%M:%S")
 
 
 temp = df.groupby(["Date", "Name"]).size().reset_index(name="Count")
@@ -23,9 +24,18 @@ data.append(temp)
 #graph1 = px.line(data1, x="Date", y="Count", color="Name")
 graphs["textsPerDay"] = px.line(data[0], x="Date", y="Count", color="Name")
 
+temp = df
+
+
 temp = df.groupby(["Time"]).size().reset_index(name="Count")
 data.append(temp)
+
 graphs["timeOfText"] = px.bar(data[1], x="Time", y="Count")
+
+graphs["timeOfText"].update_layout(
+   bargap=0
+)
+
 graphs["timeOfText"].show()
 
 
@@ -37,7 +47,14 @@ app.layout = html.Div(children=[
    dcc.Graph(
       id="graph",
       figure = graphs["textsPerDay"]
-   )
+   ),
+
+   html.H3(children="Time message was sent"),
+
+   dcc.Graph(
+      id="graph2",
+      figure = graphs["timeOfText"]
+   ),
 ])
 
 # if __name__ == "__main__":
