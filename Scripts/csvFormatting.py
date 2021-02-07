@@ -103,7 +103,8 @@ def main():
    formattedLeon2 = filtered_csv_format(rawLeon2)
    fullData = formattedLeon + formattedLeon2 + formattedKristi
    
-   csv_write("Data/sortedData.csv", fullData)
+   print("no error")
+   #csv_write("Data/sortedData.csv", fullData)
 
 main()
 
