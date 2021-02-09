@@ -43,16 +43,16 @@ def texts_per_month(temp):
 
 # Day message sent
 def texts_day_of_week(df):
-   temp = df
-   print(df)
+   # If you don't do this, df will get reassigned with the values of temp
+   temp = df.rename(columns = {"Name":"a"})
+   temp = temp.rename(columns = {"a":"Name"})
+
    temp["Date"] = temp["Date"].dt.day_name()
-   print(df)
    temp = temp.groupby(["Date", "Name"]).size().reset_index(name="Count")
    temp["Date"] = pd.Categorical(temp["Date"], categories=["Monday","Tuesday","Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ordered=True)
    temp = temp.pivot(index="Date", columns="Name", values="Count")
    data.append(temp)
    graphs["weekDaySent"] = px.bar(data[2], x=data[2].index, y=["Kristi", "Leon"], barmode="group")
-   print(df)
 
 # Time message was sent
 def texts_per_time(df):
@@ -75,9 +75,9 @@ def count_words_sent(df):
    mostWords = temp_day["Total"].max()
    avgMsgsK = temp_day["Kristi"].mean()
    avgMsgsL = temp_day["Leon"].mean()
-   # print(df)
-   # print(temp_day)
-   # print(wordCount, mostWords, avgMsgsK, avgMsgsL)
+   print(df)
+   print(temp_day)
+   print(wordCount, mostWords, avgMsgsK, avgMsgsL)
 
 def layout():
    app.layout = html.Div(children=[
@@ -133,7 +133,6 @@ def main():
    texts_per_time(dataframe)
    text_ratio(dataframe)
    count_words_sent(dataframe)
-   #print(dataframe.loc[2,:])
    layout()
 
 if __name__ == "__main__":
