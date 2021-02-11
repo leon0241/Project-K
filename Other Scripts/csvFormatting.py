@@ -63,7 +63,8 @@ def filtered_csv_format(mainArray):
       name, date, message = mainArray[i]
       newArray[0] = name
       # Replace date format from DD/MM/YYYY to DD-MM-YYYY
-      newArray[1] = date.replace("/", "-")
+      day, month, year = date[0:2], date[3:5], date[6:10]
+      newArray[1] = year + "-" + month + "-" + day
       
       # If starts with a link
       if message.startswith("https://") == True:
@@ -87,7 +88,7 @@ def filtered_csv_format(mainArray):
    return formattedArray
 
 def csv_write(filename, array):
-   csvfile = open(filename, 'w', encoding = 'utf-8', newline='', engine='python')
+   csvfile = open(filename, 'w', encoding = 'utf-8', newline='')
    with csvfile:
       writer = csv.writer(csvfile)
       

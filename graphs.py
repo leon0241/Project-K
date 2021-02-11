@@ -88,7 +88,7 @@ def stat_functions(df):
 def word_occurances(df):
    ndf = df.rename(columns = {"Name":"a"})
    ndf = ndf.rename(columns = {"a":"Name"})
-   ndf_k, ndf_l = [x for _, x in ndf.groupby(ndf["Name"] == "Leon")]
+   ndf_l, ndf_k = [x for _, x in ndf.groupby(ndf["Name"] == "Leon")]
 
    ndf_k = ndf_k.reset_index()
    ndf_l = ndf_l.reset_index()
