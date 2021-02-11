@@ -3,7 +3,7 @@
 import csv
 
 def filestuff():
-   file = open("data/unfilteredtext.txt", "r", encoding = 'utf-8')
+   file = open("data/rawData/unfilteredtext.txt", "r", encoding = 'utf-8')
    contents = file.read()
    file.close()
    contents = contents.split("\n") # Split new line

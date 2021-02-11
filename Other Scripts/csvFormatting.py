@@ -12,7 +12,7 @@ def filestuff():
    # Repeats 2 times for leon and kristi
    for i in range(2): 
       # Open file [i]
-      with open(names[i], "r", encoding="cp437") as file:
+      with open(names[i], "r", encoding="utf-8") as file:
          rawContents = csv.reader(file, delimiter=",")
          # If Leon
          if i == 0:
@@ -26,7 +26,7 @@ def filestuff():
                arrContentsKristi.append(row)
       file.close()
    
-   with open("Data/rawData/filteredLeon.csv", "r", encoding="cp437") as file:
+   with open("Data/rawData/filteredLeon.csv", "r", encoding="utf-8") as file:
       rawContents = csv.reader(file, delimiter=",")
       for row in rawContents:
          arrContentsLeon2.append(row)
@@ -87,7 +87,7 @@ def filtered_csv_format(mainArray):
    return formattedArray
 
 def csv_write(filename, array):
-   csvfile = open(filename, 'w', encoding = 'cp437', newline='')
+   csvfile = open(filename, 'w', encoding = 'utf-8', newline='', engine='python')
    with csvfile:
       writer = csv.writer(csvfile)
       
@@ -104,7 +104,7 @@ def main():
    fullData = formattedLeon + formattedLeon2 + formattedKristi
    
    print("no error")
-   #csv_write("Data/sortedData.csv", fullData)
+   csv_write("Data/sortedData.csv", fullData)
 
 main()
 
