@@ -147,21 +147,19 @@ def reassign_df(df):
    return ndf
 
 def graph_functions():
+   graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"]) # pylint: disable=maybe-no-member
+   graphs["textsPerDayTrend"] = px.scatter(data[0], x=data[0].index, y=["Kristi", "Leon"], trendline="lowess") # pylint: disable=maybe-no-member
+   graphs["totalTextsPerDay"] = px.bar(data[0], x=data[0].index, y=["Kristi", "Leon"], title="Chart") # pylint: disable=maybe-no-member
 
-   graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"])
-   graphs["textsPerDayTrend"] = px.scatter(data[0], x=data[0].index, y=["Kristi", "Leon"], trendline="lowess")
+   graphs["textsPerMonth"] = px.bar(data[1], x=data[1].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
 
-   graphs["totalTextsPerDay"] = px.bar(data[0], x=data[0].index, y=["Kristi", "Leon"], title="Chart")
+   graphs["weekDaySent"] = px.bar(data[2], x="Count", y="Date", orientation='h')
 
-   graphs["textsPerMonth"] = px.bar(data[1], x=data[1].index, y=["Kristi", "Leon"], barmode="group")
+   graphs["indWeekDaySent"] = px.bar(data[3], x=data[3].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
 
-   graphs["weekDaySent"] = px.bar(data[2], x="Date", y="Count", barmode="group")
+   graphs["hourOfText"] = px.bar(data[4], x=data[4].index, y="Count") # pylint: disable=maybe-no-member
 
-   graphs["indWeekDaySent"] = px.bar(data[3], x=data[3].index, y=["Kristi", "Leon"], barmode="group")
-
-   graphs["hourOfText"] = px.bar(data[4], x=data[4].index, y="Count")
-
-   graphs["timeOfText"] = px.bar(data[5], x=data[5].index, y="Count")
+   graphs["timeOfText"] = px.bar(data[5], x=data[5].index, y="Count") # pylint: disable=maybe-no-member
 
    graphs["percentMessages"] = px.pie(data[6], values="Count", names="Name")
 
