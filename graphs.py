@@ -5,7 +5,7 @@ import plotly.express as px
 import pandas as pd
 import os
 import numpy as np
-import emoji as em
+import emoji
 graphs = {}
 data = [0] * 10
 
@@ -97,6 +97,93 @@ def text_ratio(df):
    ndf = df.groupby(["Name"]).size().reset_index(name="Count")
    data[6] = ndf
 
+# Word occurances aka just emoji occurances
+def word_occurances(df):
+   ndf = df.rename(columns = {"Name":"a"})
+   ndf = ndf.rename(columns = {"a":"Name"})
+   ndf_l, ndf_k = [x for _, x in ndf.groupby(ndf["Name"] == "Leon")]
+
+   ndf_k = ndf_k.reset_index()
+   ndf_l = ndf_l.reset_index()
+   arr = [ndf_k, ndf_l]
+   
+   # Separately for each person
+   for i in range(2):
+
+      ndf_t = arr[i]
+
+      # Split for every word
+      words = ndf_t["Contents"].str.split(expand=True).stack().value_counts()
+      # Converts to dataframe? idk tbh
+      ndf_w = words.to_frame()
+      ndf_w = ndf_w.reset_index()
+      ndf_w = ndf_w.rename(columns = {"index":"Word", 0:"Count"})
+
+      # Converts array into 2d list.. idk how to do this purely using pandas
+      wordArray = ndf_w.values.tolist()
+      emojiArray = emoji_filter(wordArray)
+      
+      # Convert back into dataframe
+      ndf_e = pd.DataFrame(emojiArray, columns =["Emoji", "Count"])
+
+      # Group by name and get total count
+      ndf_e = ndf_e.groupby("Emoji").sum()
+
+      if i == 0:
+         ndf_e.insert(0, "Name", "Leon")
+         ndf_l = ndf_e
+         #ndf_e.to_csv("Data/emojisl.csv")
+      else:
+         ndf_e.insert(0, "Name", "Kristi")
+         ndf_k = ndf_e
+         #ndf_e.to_csv("Data/emojisk.csv")
+   # Combine the 2 arrays
+   ndf = pd.concat([ndf_k, ndf_l])
+   # Sort by count
+   ndf = ndf.sort_values(by=["Count"], ascending=False)
+   ndf = ndf.reset_index()
+   # Emojize the demojized emojis
+   ndf["Emoji"] = ndf["Emoji"].apply(emoji.emojize)
+   # Grab top 20 emojis
+   ndf_tt = ndf.head(20)
+   data[7] = ndf_tt
+   # Group by name
+   ndf = ndf.groupby("Name").sum()
+   data[8] = ndf
+
+def emoji_filter(wordArray):
+   emojiArray = []
+   # Emoji filtering
+   for value in wordArray:
+      # Set word
+      word = value[0]
+      # Demojize (👀 -> :eyes:)
+      demoji = emoji.demojize(word)
+      # Check if word is a demojized word or not
+      if demoji.startswith(":") and demoji.endswith(":"):
+         # Check if word has more than one emoji (e.g 👀👀/:eyes::eyes:)
+         if demoji.rfind("::") != -1:
+            # Split by ::
+            demojiArray = demoji.split("::")
+            # Repeats each item in array to convert to pure emoji (:eyes:)
+            for item in demojiArray:
+               # If is in format ":eyes"
+               if item.startswith(":") == True and item.endswith(":") == False:
+                  item = item + ":"
+               # If in format "eyes:"
+               elif item.startswith(":") == False and item.endswith(":") == True:
+                  item = ":" + item
+               # Only other format is "eyes"
+               else:
+                  item = ":" + item + ":"
+               # Append item, count
+               emojiArray.append([item, value[1]])
+         # If word only has one emoji
+         else:                  
+            # Append item, count
+            emojiArray.append([demoji, value[1]])
+   return emojiArray
+
 # Count words sent
 def stat_functions(df):
    ndf = df.rename(columns = {"Name":"a"})
@@ -108,38 +195,12 @@ def stat_functions(df):
    wordCount = ndf["Count"].sum()
    pictureCount = ndf["Attachments"].count()
 
-   mostWords = ndf_d["Total"].max()
-   mostWordsDate = ndf_d["Total"].idxmax()
-   avgMsgs = ndf_d["Total"].mean()
+   mostWords = ndf_d["Total"].max() # pylint: disable=unsubscriptable-object
+   mostWordsDate = ndf_d["Total"].idxmax() # pylint: disable=unsubscriptable-object
+   avgMsgs = ndf_d["Total"].mean() # pylint: disable=unsubscriptable-object
    avgMsgsLen = ndf["Count"].mean()
 
    print(messageCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
-
-def word_occurances(df):
-   ndf = df.rename(columns = {"Name":"a"})
-   ndf = ndf.rename(columns = {"a":"Name"})
-   ndf_l, ndf_k = [x for _, x in ndf.groupby(ndf["Name"] == "Leon")]
-
-   ndf_k = ndf_k.reset_index()
-   ndf_l = ndf_l.reset_index()
-   arr = [ndf_k, ndf_l]
-   for i in range(2):
-      ndf_t = arr[i]
-
-      words = ndf_t["Contents"].str.split(expand=True).stack().value_counts()
-      ndf_wt = words.to_frame()
-      ndf_wt = ndf_wt.reset_index()
-      ndf_wt = ndf_wt.rename(columns = {"index":"Word", 0:"Count"})
-
-      wordArray = ndf_wt.values.tolist()
-
-   #    if i == 0:
-   #       ndf_wk = ndf_wt
-   #    else:
-   #       ndf_wl = ndf_wt
-   
-   # ndf_wk.to_csv("Data/wordsL.csv")
-   # ndf_wl.to_csv("Data/wordsK.csv")
 
 def reassign_df(df):
    ndf = df.rename(columns = {"Name":"a"})
@@ -162,6 +223,9 @@ def graph_functions():
    graphs["timeOfText"] = px.bar(data[5], x=data[5].index, y="Count") # pylint: disable=maybe-no-member
 
    graphs["percentMessages"] = px.pie(data[6], values="Count", names="Name")
+
+   graphs["emojiPie"] = px.pie(data[7], values="Count", names="Emoji")
+   graphs["emojiFrequency"] = px.bar(data[8], x=data[8].index , y="Count") # pylint: disable=maybe-no-member
 
 
 def layout():
@@ -213,6 +277,18 @@ def layout():
       dcc.Graph(
          id="graph6",
          figure = graphs["weekDaySent"]
+      ),
+
+      html.H3(children="Emoji"),
+
+      dcc.Graph(
+         id="graph8",
+         figure = graphs["emojiPie"]
+      ),
+
+      dcc.Graph(
+         id="graph9",
+         figure = graphs["emojiFrequency"]
       ),
    ])
 
