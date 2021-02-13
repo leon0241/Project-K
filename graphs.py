@@ -6,7 +6,6 @@ import pandas as pd
 import os
 import numpy as np
 import emoji
-graphs = {}
 data = [0] * 10
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -50,6 +49,8 @@ def texts_day_of_week(df):
 
    # Recategorise date to be in chronological order
    ndf["Date"] = pd.Categorical(ndf["Date"], categories=["Monday","Tuesday","Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ordered=True)
+   ndf = ndf.sort_values("Date")
+   ndf = ndf.set_index("Date")
    data[2] = ndf
 
 # Individual messages sent - weekday
@@ -99,8 +100,8 @@ def text_ratio(df):
 
 # Word occurances aka just emoji occurances
 def word_occurances(df):
-   ndf = df.rename(columns = {"Name":"a"})
-   ndf = ndf.rename(columns = {"a":"Name"})
+   ndf = reassign_df(df)
+
    ndf_l, ndf_k = [x for _, x in ndf.groupby(ndf["Name"] == "Leon")]
 
    ndf_k = ndf_k.reset_index()
@@ -140,16 +141,26 @@ def word_occurances(df):
    # Combine the 2 arrays
    ndf = pd.concat([ndf_k, ndf_l])
    # Sort by count
-   ndf = ndf.sort_values(by=["Count"], ascending=False)
-   ndf = ndf.reset_index()
+
+   
+   #ndf = ndf.reset_index()
    # Emojize the demojized emojis
+   ndf = ndf.reset_index()
    ndf["Emoji"] = ndf["Emoji"].apply(emoji.emojize)
+   ndf = ndf.sort_values(by=["Count"], ascending=False)
+   ndf = ndf.set_index("Emoji")
+   #print(ndf)
    # Grab top 20 emojis
-   ndf_tt = ndf.head(20)
-   data[7] = ndf_tt
+   data[7] = ndf
+
+   ndf_w = ndf.pivot(columns="Name", values="Count")
+   ndf_w["Total"] = ndf_w.sum(axis=1)
+   ndf_w = ndf_w.sort_values(by=["Total"], ascending=False)
+   data[8] = ndf_w
+
    # Group by name
    ndf = ndf.groupby("Name").sum()
-   data[8] = ndf
+   data[9] = ndf
 
 def emoji_filter(wordArray):
    emojiArray = []
@@ -186,21 +197,33 @@ def emoji_filter(wordArray):
 
 # Count words sent
 def stat_functions(df):
-   ndf = df.rename(columns = {"Name":"a"})
-   ndf = ndf.rename(columns = {"a":"Name"})
+   ndf = reassign_df(df)
+
+   stats = {}
 
    ndf_d = data[0]
+   ndf_wd = data[2]
+   ndf_t = data[4]
+   ndf_e = data[7]
+   ndf_ew = data[8]
    ndf["Count"] = df["Contents"].str.split().str.len()
-   messageCount = ndf.size
-   wordCount = ndf["Count"].sum()
-   pictureCount = ndf["Attachments"].count()
+   stats["messageCount"] = ndf.size
+   stats["wordCount"] = ndf["Count"].sum()
+   stats["pictureCount"] = ndf["Attachments"].count()
+   stats["emojiCount"] = ndf_e["Count"].sum() # pylint: disable=unsubscriptable-object
 
-   mostWords = ndf_d["Total"].max() # pylint: disable=unsubscriptable-object
-   mostWordsDate = ndf_d["Total"].idxmax() # pylint: disable=unsubscriptable-object
-   avgMsgs = ndf_d["Total"].mean() # pylint: disable=unsubscriptable-object
-   avgMsgsLen = ndf["Count"].mean()
 
-   print(messageCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
+   stats["mostWords"] = ndf_d["Total"].max() # pylint: disable=unsubscriptable-object
+   stats["mostWordsDate"] = ndf_d["Total"].idxmax() # pylint: disable=unsubscriptable-object
+   stats["avgMsgs"] = ndf_d["Total"].mean() # pylint: disable=unsubscriptable-object
+   stats["avgMsgsLen"] = ndf["Count"].mean()
+   stats["mostUsedEmoji"] = ndf_ew["Total"].idxmax() # pylint: disable=unsubscriptable-object
+   stats["activeHour"] = ndf_t["Count"].idxmax() # pylint: disable=unsubscriptable-object
+   stats["activeDay"] = ndf_wd["Count"].idxmax() # pylint: disable=unsubscriptable-object
+   return stats
+
+   #print(messageCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
+   #462156 400031.0 1192 1403 2020-09-21 00:00:00 472.55214723926383 5.235939320165967 13326
 
 def reassign_df(df):
    ndf = df.rename(columns = {"Name":"a"})
@@ -208,13 +231,14 @@ def reassign_df(df):
    return ndf
 
 def graph_functions():
+   graphs = {}
    graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"]) # pylint: disable=maybe-no-member
    graphs["textsPerDayTrend"] = px.scatter(data[0], x=data[0].index, y=["Kristi", "Leon"], trendline="lowess") # pylint: disable=maybe-no-member
    graphs["totalTextsPerDay"] = px.bar(data[0], x=data[0].index, y=["Kristi", "Leon"], title="Chart") # pylint: disable=maybe-no-member
 
    graphs["textsPerMonth"] = px.bar(data[1], x=data[1].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
 
-   graphs["weekDaySent"] = px.bar(data[2], x="Count", y="Date", orientation='h')
+   graphs["weekDaySent"] = px.bar(data[2], x="Count", y=data[2].index, orientation='h') # pylint: disable=maybe-no-member
 
    graphs["indWeekDaySent"] = px.bar(data[3], x=data[3].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
 
@@ -224,72 +248,125 @@ def graph_functions():
 
    graphs["percentMessages"] = px.pie(data[6], values="Count", names="Name")
 
-   graphs["emojiPie"] = px.pie(data[7], values="Count", names="Emoji")
-   graphs["emojiFrequency"] = px.bar(data[8], x=data[8].index , y="Count") # pylint: disable=maybe-no-member
+   tt = data[7].head(20) # pylint: disable=maybe-no-member
+   graphs["emojiPie"] = px.pie(tt, values="Count", names=tt.index)
+   graphs["emojiFrequency"] = px.bar(data[9], x=["Kristi", "Leon"] , y="Count") # pylint: disable=maybe-no-member
+   return graphs
 
 
-def layout():
-   app.layout = html.Div(children=[
-      html.H1(children="it's a count :D "),
+# stats["messageCount"] = ndf.size
+#    stats["wordCount"] = ndf["Count"].sum()
+#    stats["pictureCount"] = ndf["Attachments"].count()
+#    stats["emojiCount"] = ndf_e["Count"].sum() # pylint: disable=unsubscriptable-object
 
-      html.H2(children="Percentage of messages sent by each person"),
 
-      dcc.Graph(
-         id="graph4",
-         figure = graphs["percentMessages"]
-      ),
+#    stats["mostWords"] = ndf_d["Total"].max() # pylint: disable=unsubscriptable-object
+#    stats["mostWordsDate"] = ndf_d["Total"].idxmax() # pylint: disable=unsubscriptable-object
+#    stats["avgMsgs"] = ndf_d["Total"].mean() # pylint: disable=unsubscriptable-object
+#    stats["avgMsgsLen"] = ndf["Count"].mean()
+#    stats["mostUsedEmoji"] = ndf_ew["Total"].idxmax()
 
-      html.H2(children="Number of messages per day"),
+def layout(graphs, stats):
+   app.layout = html.Div(id="pageDiv", children=[
+      html.Div(id="header", className="outerDiv", children=[
+         html.H1("Kristi Count"),
+         html.H2("Percentage of messages sent by each person")
+      ]),
 
-      dcc.Graph(
-         id="graph",
-         figure = graphs["textsPerDay"]
-      ),
+      html.Div(id="generalStats", className="outerDiv", children=[
+         html.Div(className="innerDiv graphDiv", children=[
+            html.H2("Percentage of messages sent"),
+            dcc.Graph(
+               id="graph_1",
+               figure = graphs["percentMessages"]
+            )
+         ]),
+         
+         html.Div(className="innerDiv", children=[
+            html.H2("Stats"),
+            html.Div(className="divElement statContainer", children=[
+               html.Div(className="divElement generalStat", children=[
+               html.H3(stats["messageCount"])
+               ]),
+               html.Div(className="divElement generalStat", children=[
+                  html.H3(stats["wordCount"])
+               ]),
+               html.Div(className="divElement generalStat", children=[
+                  html.H3(stats["pictureCount"])
+               ]),
+               html.Div(className="divElement generalStat", children=[
+                  html.H3(stats["emojiCount"])
+               ])
+            ])
+         ])
+      ]),
 
-      dcc.Graph(
-         id="graph7",
-         figure = graphs["textsPerDayTrend"]
-      ),
+      html.Div(className="outerDiv", children=[
+         html.H2("Number of messages per day"),
 
-      html.H2(children="Total texts per day"),
+         dcc.Graph(
+            id="graph_2",
+            figure = graphs["textsPerDay"]
+         ),
 
-      dcc.Graph(
-         id="graph2",
-         figure = graphs["totalTextsPerDay"]
-      ),
+         html.H3(stats["avgMsgs"]),
 
-      html.H3(children="Average texts per month"),
+         dcc.Graph(
+            id="graph_3",
+            figure = graphs["totalTextsPerDay"]
+         )
+      ]),
 
-      dcc.Graph(
-         id="graph3",
-         figure = graphs["textsPerMonth"]
-      ),
+      html.Div(className="outerDiv", children=[
+         html.Div(className="innerDiv", children=[
+            html.Div(className="divElement", children=[
+               html.H3(stats["activeHour"])
+            ]),
 
-      html.H3(children="Time message was sent"),
+            dcc.Graph(
+               id="graph3",
+               figure = graphs["hourOfText"]
+            )
+         ]),
+         
+         html.Div(className="innerDiv", children=[
+            html.Div(className="divElement", children=[
+               html.H3(stats["activeDay"])
+            ]),
 
-      dcc.Graph(
-         id="graph5",
-         figure = graphs["hourOfText"]
-      ),
+            dcc.Graph(
+               id="graph5",
+               figure = graphs["weekDaySent"]
+            )
+         ])
+      ]),
 
-      html.H3(children="Time message was sent"),
+      html.Div(className="outerDiv", children=[
+         html.Div(className="separatorDiv", children=[
+            html.Div(className="innerDiv", children=[
+               dcc.Graph(
+                  id="graph8",
+                  figure = graphs["emojiPie"]
+               )
+            ]),
 
-      dcc.Graph(
-         id="graph6",
-         figure = graphs["weekDaySent"]
-      ),
+            html.Div(children=[
+               html.H2("Top emojis"),
+               html.Div(children=[
+                  html.H2(stats["mostUsedEmoji"])
+               ])
+            ])
+         ]),
 
-      html.H3(children="Emoji"),
+         html.Div(className="separatorDiv", children=[
+            html.H2("w.e"),
+            dcc.Graph(
+               id="graph9",
+               figure = graphs["emojiFrequency"]
+            ),
+         ])
+      ])
 
-      dcc.Graph(
-         id="graph8",
-         figure = graphs["emojiPie"]
-      ),
-
-      dcc.Graph(
-         id="graph9",
-         figure = graphs["emojiFrequency"]
-      ),
    ])
 
 def main():
@@ -300,10 +377,10 @@ def main():
    texts_per_hour(dataframe)
    texts_per_time(dataframe)
    text_ratio(dataframe)
-   stat_functions(dataframe)
    word_occurances(dataframe)
-   graph_functions()
-   layout()
+   stats = stat_functions(dataframe)
+   graphs = graph_functions()
+   layout(graphs, stats)
 
 if __name__ == "__main__":
    main()

@@ -1,0 +1,19 @@
+.outerDiv {
+  display: flex;
+  flex-direction: column;
+}
+#generalStats {
+  flex-direction: row;
+}
+.innerDiv {
+  display: flex;
+}
+.outerDiv > .graphDiv {
+  flex-direction: column;
+}
+.statContainer {
+  flex-direction: column;
+}
+.divElement .generalStat {
+  display: grid;
+}
