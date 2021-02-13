@@ -7,7 +7,7 @@ import os
 import numpy as np
 import emoji as em
 graphs = {}
-data = []
+data = [0] * 10
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -23,57 +23,79 @@ def initialise_dataframe():
 
 # Number of texts sent per day per person
 def texts_over_date(df):
+   # Group by name, with new column Count
    ndf = df.groupby(["Date", "Name"]).size().reset_index(name="Count")
+
+   # Pivot to wide format
    ndf = ndf.pivot(index="Date", columns="Name", values="Count")
+
+   # Kristi + Leon is total
    ndf["Total"] = ndf["Kristi"] + ndf["Leon"]
-   data.append(ndf)
-   texts_per_day()
-   texts_per_month(ndf)
+   data[0] = ndf
 
-# Number of texts sent per month
-def texts_per_month(df):
-   df = df.resample('M').mean()
-   data.append(df)
+   # Number of texts sent per month per person
+   ndf = ndf.resample('M').mean()
+   data[1] = ndf
 
-# Day message sent
+# Total messages sent - weekday
 def texts_day_of_week(df):
    # If you don't do this, df will get reassigned with the values of temp
-   ndf = df.rename(columns = {"Name":"a"})
-   ndf = ndf.rename(columns = {"a":"Name"})
+   ndf = reassign_df(df)
 
+   # Rename date to weekday name
    ndf["Date"] = ndf["Date"].dt.day_name()
+
+   # Group by day with new column Count
    ndf = ndf.groupby(["Date"]).size().reset_index(name="Count")
+
+   # Recategorise date to be in chronological order
    ndf["Date"] = pd.Categorical(ndf["Date"], categories=["Monday","Tuesday","Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ordered=True)
-   data.append(ndf)
+   data[2] = ndf
 
+# Individual messages sent - weekday
 def ind_day_of_week(df):
-   ndf = df.rename(columns = {"Name":"a"})
-   ndf = ndf.rename(columns = {"a":"Name"})
+   # If you don't do this, df will get reassigned with the values of temp
+   ndf = reassign_df(df)
 
+   # Rename date to weekday name
    ndf["Date"] = ndf["Date"].dt.day_name()
+   
+   #Group by day > name with new column Count
    ndf = ndf.groupby(["Date", "Name"]).size().reset_index(name="Count")
 
+   # Recategorise data
    ndf["Date"] = pd.Categorical(ndf["Date"], categories=["Monday","Tuesday","Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ordered=True)
-   data.append(ndf)
+
+   # Pivot to wide format
    ndf = ndf.pivot(index="Date", columns="Name", values="Count")
+   data[3] = ndf
 
 # Time message was sent
 def texts_per_hour(df):
+   # Group by time with new column Count
    ndf = df.groupby(["Time"]).size().reset_index(name="Count")
+   
+   # Set index to time
    ndf = ndf.set_index("Time")
+
+   # Regroup with hour and find sum
    ndf = ndf.resample('H').sum()
-   data.append(ndf)
+   data[4] = ndf
 
 # Time in minutes message was sent
 def texts_per_time(df):
+   # Group by time with new column Count
    ndf = df.groupby(["Time"]).size().reset_index(name="Count")
+
+   # Set index to time
    ndf = ndf.set_index("Time")
-   data.append(ndf)
+   data[5] = ndf
 
 # Percentages of messages sent
 def text_ratio(df):
+   # Group by name with new column Count
    ndf = df.groupby(["Name"]).size().reset_index(name="Count")
-   data.append(ndf)
+   data[6] = ndf
 
 # Count words sent
 def stat_functions(df):
@@ -119,7 +141,12 @@ def word_occurances(df):
    # ndf_wk.to_csv("Data/wordsL.csv")
    # ndf_wl.to_csv("Data/wordsK.csv")
 
-def graphs():
+def reassign_df(df):
+   ndf = df.rename(columns = {"Name":"a"})
+   ndf = ndf.rename(columns = {"a":"Name"})
+   return ndf
+
+def graph_functions():
 
    graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"])
    graphs["textsPerDayTrend"] = px.scatter(data[0], x=data[0].index, y=["Kristi", "Leon"], trendline="lowess")
@@ -130,16 +157,13 @@ def graphs():
 
    graphs["weekDaySent"] = px.bar(data[2], x="Date", y="Count", barmode="group")
 
-   graphs["weekDaySent"] = px.bar(data[2], x=data[2].index, y=["Kristi", "Leon"], barmode="group")
+   graphs["indWeekDaySent"] = px.bar(data[3], x=data[3].index, y=["Kristi", "Leon"], barmode="group")
 
-   graphs["timeOfText"] = px.bar(data[3], x=data[3].index, y="Count")
+   graphs["hourOfText"] = px.bar(data[4], x=data[4].index, y="Count")
 
-   graphs["timeOfText"] = px.bar(data[3], x=data[3].index, y="Count")
+   graphs["timeOfText"] = px.bar(data[5], x=data[5].index, y="Count")
 
-   graphs["percentMessages"] = px.pie(data[4], values="Count", names="Name")
-
-
-
+   graphs["percentMessages"] = px.pie(data[6], values="Count", names="Name")
 
 
 def layout():
@@ -183,7 +207,7 @@ def layout():
 
       dcc.Graph(
          id="graph5",
-         figure = graphs["timeOfText"]
+         figure = graphs["hourOfText"]
       ),
 
       html.H3(children="Time message was sent"),
@@ -198,10 +222,13 @@ def main():
    dataframe = initialise_dataframe()
    texts_over_date(dataframe)
    texts_day_of_week(dataframe)
+   ind_day_of_week(dataframe)
    texts_per_hour(dataframe)
+   texts_per_time(dataframe)
    text_ratio(dataframe)
    stat_functions(dataframe)
    word_occurances(dataframe)
+   graph_functions()
    layout()
 
 if __name__ == "__main__":
