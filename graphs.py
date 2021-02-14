@@ -323,18 +323,6 @@ def apply_layout(graph):
    graph.update_traces(def_trace)
    return graph
 
-# stats["messageCount"] = ndf.size
-#    stats["wordCount"] = ndf["Count"].sum()
-#    stats["pictureCount"] = ndf["Attachments"].count()
-#    stats["emojiCount"] = ndf_e["Count"].sum() # pylint: disable=unsubscriptable-object
-
-
-#    stats["mostWords"] = ndf_d["Total"].max() # pylint: disable=unsubscriptable-object
-#    stats["mostWordsDate"] = ndf_d["Total"].idxmax() # pylint: disable=unsubscriptable-object
-#    stats["avgMsgs"] = ndf_d["Total"].mean() # pylint: disable=unsubscriptable-object
-#    stats["avgMsgsLen"] = ndf["Count"].mean()
-#    stats["mostUsedEmoji"] = ndf_ew["Total"].idxmax()
-
 def layout(graphs, stats):
    app.layout = html.Div(id="pageDiv", children=[
       html.Div(id="header", className="outerDiv", children=[
@@ -404,15 +392,43 @@ def layout(graphs, stats):
          ])
       ]),
 
-      html.Div(className="outerDiv", children=[
+      html.Div(id="perDay", className="outerDiv", children=[
          html.H2("Number of messages per day"),
 
          dcc.Graph(
             id="graph_2",
             figure = graphs["textsPerDay"]
          ),
+         html.Div(className="innerDiv", children=[
+            html.Div(id="textLeft", className="divElement", children=[
+               html.Div(className="centerDiv", children=[
+                  html.H3(className="", children=[
+                  "We text an average of ",
+                  html.Span(className="highlight", children=[
+                     str(round(stats["avgMsgs"]))]),
+                     " messages per day",
+                     html.Br(),
+                  "That's around 20 a messages an hour!"]),
+               ])
+            ]),
 
-         html.H3("We text an average of " + str(round(stats["avgMsgs"])) + " messages per day. That's around 20 a messages an hour!"),
+            html.Div(id="textRight", className="divElement", children=[
+               html.Div(className="centerDiv", children=[
+                  html.H3(className="", children=[
+                  "Our busiest day was ",
+                  html.Span(className="highlight", children=[
+                     str(stats["mostWordsDate"])[0:10]]), ", ",
+                  html.Br(),
+                  "where we sent ",
+                  html.Span(className="highlight", children=[
+                     str(stats["mostWords"])]),
+                  " messages",
+                  html.Br(),
+                  "That's around 58 a messages an hour!"]),
+               ])
+            ])
+         ]),
+         
 
          dcc.Graph(
             id="graph_3",
@@ -441,7 +457,7 @@ def layout(graphs, stats):
 
             html.Div(className="divElement", children=[
                html.H2("And our most active day of the week is: "),
-               html.H3(stats["activeDay"])
+               html.H2(stats["activeDay"])
             ])
          ])
       ]),

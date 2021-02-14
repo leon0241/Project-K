@@ -19,21 +19,45 @@ H4 {
 #generalStats {
   flex-direction: row;
 }
-#generalStats .innerDiv {
+#generalStats #percGraphDiv {
   display: flex;
   flex-direction: column;
   flex: 1 1 0;
 }
-#generalStats #percStatsDiv .generalStat {
-  display: flex;
-  flex-direction: row;
-  flex: 1 1 0;
+#generalStats #percStatsDiv {
+  display: grid;
+  grid-template-columns: 10% 25% 15% auto 15%;
+  grid-template-rows: repeat(4, 25%);
 }
-#generalStats #percStatsDiv .generalStat .statLeon {
+#generalStats #percStatsDiv .statLeon {
   color: #88C0D0;
 }
-#generalStats #percStatsDiv .generalStat .statKristi {
+#generalStats #percStatsDiv .statKristi {
   color: #B48EAD;
+}
+#perDay .innerDiv {
+  display: flex;
+  flex-direction: row;
+  margin: 0 60px;
+}
+#perDay .innerDiv .divElement {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  background-color: #434C5E;
+  margin: 0 60px;
+  border-radius: 20px;
+}
+#perDay .innerDiv .divElement .centerDiv {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+#perDay .innerDiv .divElement .centerDiv h3 {
+  margin: 0;
+}
+#perDay .innerDiv .divElement span {
+  color: #EBCB8B;
 }
 #activeTime .innerDiv {
   display: flex;
@@ -46,6 +70,11 @@ H4 {
 }
 #activeTime .innerDiv .divElement {
   flex: 1 1 0;
+}
+#activeTime .innerDiv .divElement H2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 #emojis .innerDiv {
   display: flex;

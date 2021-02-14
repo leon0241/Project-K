@@ -8,8 +8,6 @@ H1, H2, H3, H4{
    color: @nord4;
 }
 
-
-
 .outerDiv{
    display: flex;
    flex-direction: column;
@@ -22,21 +20,48 @@ H1, H2, H3, H4{
 
 #generalStats{
    flex-direction: row;
-   .innerDiv{
+   #percGraphDiv{
       display: flex;
       flex-direction: column;
       flex: 1 1 0;
    }
    #percStatsDiv{
-      .generalStat{
-         display:flex;
-         flex-direction: row;
-         flex: 1 1 0;
+      display: grid;
+      grid-template-columns: 10% 25% 15% auto 15%;
+      grid-template-rows: repeat(4, 25%);
          .statLeon{
             color: @nord8
          }
          .statKristi{
             color: @nord15
+         }
+   }
+}
+
+#perDay{
+   .innerDiv{
+      display: flex;
+      flex-direction: row;
+      margin:0 60px;
+      .divElement{
+         display: flex;
+         flex: 1 1 0;
+         align-items: center;
+         justify-content: center;
+         background-color: 
+         @nord2;
+         margin:0 60px;
+         border-radius: 20px;
+         .centerDiv{
+            padding-top: 10px;
+            padding-bottom: 10px;
+            h3{
+               margin: 0;
+            }
+         }
+
+         span{
+            color: @nord13;
          }
       }
    }
@@ -52,6 +77,11 @@ H1, H2, H3, H4{
       }
       .divElement{
          flex: 1 1 0;
+         H2{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+         }
       }
    }
 
