@@ -256,8 +256,8 @@ def graph_functions():
    graphs = {}
    colorscheme = {"Leon": colors[6], "Kristi": colors[7]}
 
-   graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"], 
-      color_discrete_map=colorscheme, line_shape="spline") # pylint: disable=maybe-no-member
+   graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"], # pylint: disable=maybe-no-member
+      color_discrete_map=colorscheme, line_shape="spline")
    graphs["textsPerDay"] = apply_layout(graphs["textsPerDay"])
 
 
@@ -265,7 +265,7 @@ def graph_functions():
    graphs["totalTextsPerDay"] = px.bar(data[0], x=data[0].index, y=["Kristi", "Leon"], title="Chart",
       color_discrete_map=colorscheme) # pylint: disable=maybe-no-member
    graphs["totalTextsPerDay"] = apply_layout(graphs["totalTextsPerDay"])
-   graphs["totalTextsPerDay"].update_layout({"bargap":"0"})
+   #graphs["totalTextsPerDay"].update_layout({"bargap":0})
 
    #graphs["textsPerMonth"] = px.bar(data[1], x=data[1].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
 
@@ -298,10 +298,12 @@ def apply_layout(graph):
    def_layout = {"plot_bgcolor": colors[2], "paper_bgcolor": "rgba(0, 0, 0, 0)", "font_color": colors[3], "legend":def_leg}
    def_x = {"color": colors[3], "linecolor": colors[3]}
    def_y = {"color": colors[3], "linecolor": colors[3]}
+   def_trace = {"marker_line_width":0}
 
    graph.update_layout(def_layout)
    graph.update_xaxes(def_x)
    graph.update_yaxes(def_y)
+   graph.update_traces(def_trace)
    return graph
 
 # stats["messageCount"] = ndf.size
