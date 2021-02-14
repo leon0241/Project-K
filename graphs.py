@@ -211,16 +211,18 @@ def stat_functions(df):
    ndf_e = data[7]
    ndf_ew = data[8]
    ndf["Count"] = df["Contents"].str.split().str.len()
-   stats["messageCount"] = len(ndf)
+   stats["MsgCount"] = len(ndf)
 
    ndf_n = data[6]
-   stats["indMessageCount"] = ndf_n["Count"].to_list()# pylint: disable=unsubscriptable-object
+   stats["indMsgCount"] = ndf_n["Count"].to_list()# pylint: disable=unsubscriptable-object
 
-   stats["wordCount"] = ndf["Count"].sum()
+   stats["wordCount"] = round(ndf["Count"].sum())
 
    ndf_n = ndf[["Name", "Count"]]
    ndf_n = ndf.groupby("Name").sum()
    stats["indWordCount"] = ndf_n["Count"].to_list()
+   stats["indWordCount"][0] = round(stats["indWordCount"][0])
+   stats["indWordCount"][1] = round(stats["indWordCount"][1])
 
    stats["pictureCount"] = ndf["Attachments"].count()
 
@@ -243,7 +245,7 @@ def stat_functions(df):
    stats["activeDay"] = ndf_wd["Count"].idxmax() # pylint: disable=unsubscriptable-object
    return stats
 
-   #print(messageCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
+   #print(MsgCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
    # 462156 400031.0 1192 1403 2020-09-21 00:00:00 472.55214723926383 5.235939320165967 13326
 
 def reassign_df(df):
@@ -342,51 +344,86 @@ def layout(graphs, stats):
          
          html.Div(id="percStatsDiv", className="innerDiv", children=[
             html.Div(className="divElement generalStat", children=[
-               html.H1(className="statEmoji", children=["✉️"]),
+               html.H2(className="gridItem statEmoji", children=["✉️"]),
                
-               html.H2(className="statMain", children=[
-                  str(stats["messageCount"]) + " Messages"]),
+               html.H2(className="gridItem statMain", children=[
+                  html.Span(className="highlight", children=[
+                     str(stats["MsgCount"])]),
+                  " Messages"]),
 
-               html.H3(className="statLeon", children=[
-                  str(stats["indMessageCount"][0])]),
+               html.H3(className="gridItem statLeon", children=[
+                  str(stats["indMsgCount"][0])]),
 
-               html.H3(className="statKristi", children=[
-                  str(stats["indMessageCount"][1])])
+               html.Div(className="gridItem percentBar", children=[
+                  html.Div(className="barLeon", style={
+                     "--size":(str(stats["indMsgCount"][0] / stats["MsgCount"] * 100) + "%")}),
+                  html.Div(className="barKristi", style={
+                     "--size":(str(stats["indMsgCount"][1] / stats["MsgCount"] * 100) + "%")})
+               ]),
+
+               html.H3(className="gridItem statKristi", children=[
+                  str(stats["indMsgCount"][1])])
             ]),
             html.Div(className="divElement generalStat", children=[
-               html.H1(className="statEmoji", children=["📄"]),
+               html.H2(className="gridItem statEmoji", children=["📄"]),
 
-               html.H2(className="statMain", children=[
-                  str(round(stats["wordCount"])) + " Words"]),
+               html.H2(className="gridItem statMain", children=[
+                  html.Span(className="highlight", children=[
+                     str(stats["wordCount"])]),
+                  " Words"]),
 
-               html.H3(className="statLeon", children=[
-                  str(round(stats["indWordCount"][0]))]),
+               html.H3(className="gridItem statLeon", children=[
+                  str(stats["indWordCount"][0])]),
 
-               html.H3(className="statKristi", children=[
-                  str(round(stats["indWordCount"][1]))])
+               html.Div(className="gridItem percentBar", children=[
+                  html.Div(className="barLeon", style={
+                     "--size":(str(stats["indWordCount"][0] / stats["wordCount"] * 100) + "%")}),
+                  html.Div(className="barKristi", style={
+                     "--size":(str(stats["indWordCount"][1] / stats["wordCount"] * 100) + "%")})
+               ]),
+
+               html.H3(className="gridItem statKristi", children=[
+                  str(stats["indWordCount"][1])])
             ]),
             html.Div(className="divElement generalStat", children=[
-               html.H1(className="statEmoji", children=["🖼️"]),
+               html.H2(className="gridItem statEmoji", children=["🖼️"]),
 
-               html.H2(className="statMain", children=[
-                  str(stats["pictureCount"]) + " Pictures"]),
+               html.H2(className="gridItem statMain", children=[
+                  html.Span(className="highlight", children=[
+                     str(stats["pictureCount"])]),
+                  " Pictures"]),
 
-               html.H3(className="statLeon", children=[
+               html.H3(className="gridItem statLeon", children=[
                   str(stats["indPicCount"][0])]),
 
-               html.H3(className="statKristi", children=[
+               html.Div(className="gridItem percentBar", children=[
+                  html.Div(className="barLeon", style={
+                     "--size":(str(stats["indPicCount"][0] / stats["pictureCount"] * 100) + "%")}),
+                  html.Div(className="barKristi", style={
+                     "--size":(str(stats["indPicCount"][1] / stats["pictureCount"] * 100) + "%")})
+               ]),
+
+               html.H3(className="gridItem statKristi", children=[
                   str(stats["indPicCount"][1])])
             ]),
             html.Div(className="divElement generalStat", children=[
-               html.H1(className="statEmoji", children=["🤔"]),
+               html.H2(className="gridItem statEmoji", children=["🤔"]),
 
-               html.H2(className="statMain", children=[
-                  str(stats["emojiCount"]) + " Emojis"]),
+               html.H2(className="gridItem statMain", children=[
+                  html.Span(className="highlight", children=[str(stats["emojiCount"])]),
+                  " Emojis"]),
 
-               html.H3(className="statLeon", children=[
+               html.H3(className="gridItem statLeon", children=[
                   str(stats["indEmojiCount"][0])]),
 
-               html.H3(className="statKristi", children=[
+               html.Div(className="gridItem percentBar", children=[
+                  html.Div(className="barLeon", style={
+                     "--size":(str(stats["indEmojiCount"][0] / stats["emojiCount"] * 100) + "%")}),
+                  html.Div(className="barKristi", style={
+                     "--size":(str(stats["indEmojiCount"][1] / stats["emojiCount"] * 100) + "%")})
+               ]),
+
+               html.H3(className="gridItem statKristi", children=[
                   str(stats["indEmojiCount"][1])])
             ])
          ])
@@ -440,7 +477,9 @@ def layout(graphs, stats):
          html.Div(className="innerDiv", children=[
             html.Div(className="divElement", children=[
                html.H2("Our most active hour of the day is:"),
-               html.H2(str(stats["activeHour"])[11:16])
+
+               html.H1(className="highlight", children=[
+                  str(stats["activeHour"])[11:16]])
             ]),
 
             dcc.Graph(
@@ -456,8 +495,9 @@ def layout(graphs, stats):
             ),
 
             html.Div(className="divElement", children=[
-               html.H2("And our most active day of the week is: "),
-               html.H2(stats["activeDay"])
+               html.H2("Our most active day of the week is: "),
+               html.H1(className="highlight", children=[
+                  stats["activeDay"]])
             ])
          ])
       ]),
