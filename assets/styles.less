@@ -1,24 +1,69 @@
+@import "colors.less";
+
+body{
+   background-color: @nord0;
+}
+
+H1, H2, H3, H4{
+   color: @nord4;
+}
+
+
+
 .outerDiv{
    display: flex;
    flex-direction: column;
+   border: solid 1px;
+   border-radius: 10px;
+   padding: 10px;
+   margin: 15px 30px;
+   background-color: @nord1;
 }
 
 #generalStats{
    flex-direction: row;
+   .innerDiv{
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 0;
+   }
+   #percStatsDiv{
+      .generalStat{
+         display:flex;
+         flex-direction: row;
+      }
+   }
 }
 
-.innerDiv{
-   display: flex;
+#activeTime{
+   .innerDiv{
+      display: flex;
+      flex-direction: row;
+      height: 400px;
+      #graph_4, #graph_5{
+         flex: 2 1 0;
+      }
+      .divElement{
+         flex: 1 1 0;
+      }
+   }
+
 }
 
-.outerDiv > .graphDiv{
-   flex-direction: column;
-}
-
-.statContainer{
-   flex-direction: column;
-}
-
-.divElement .generalStat{
-   display: grid;
+#emojis{
+   .innerDiv{
+      display: flex;
+   }
+   #emojiPie{
+      flex-direction: row;
+      .div{
+         flex-direction: column;
+         .div{
+            display: grid;
+         }
+      }
+   }
+   #otherThing{
+      flex-direction: column;
+   }
 }

@@ -1,19 +1,57 @@
+body {
+  background-color: #2E3440;
+}
+H1,
+H2,
+H3,
+H4 {
+  color: #D8DEE9;
+}
 .outerDiv {
   display: flex;
   flex-direction: column;
+  border: solid 1px;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 15px 30px;
+  background-color: #3B4252;
 }
 #generalStats {
   flex-direction: row;
 }
-.innerDiv {
+#generalStats .innerDiv {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+}
+#generalStats #percStatsDiv .generalStat {
+  display: flex;
+  flex-direction: row;
+}
+#activeTime .innerDiv {
+  display: flex;
+  flex-direction: row;
+  height: 400px;
+}
+#activeTime .innerDiv #graph_4,
+#activeTime .innerDiv #graph_5 {
+  flex: 2 1 0;
+}
+#activeTime .innerDiv .divElement {
+  flex: 1 1 0;
+}
+#emojis .innerDiv {
   display: flex;
 }
-.outerDiv > .graphDiv {
+#emojis #emojiPie {
+  flex-direction: row;
+}
+#emojis #emojiPie .div {
   flex-direction: column;
 }
-.statContainer {
-  flex-direction: column;
-}
-.divElement .generalStat {
+#emojis #emojiPie .div .div {
   display: grid;
+}
+#emojis #otherThing {
+  flex-direction: column;
 }

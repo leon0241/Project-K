@@ -1,6 +1,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import os
@@ -9,6 +10,7 @@ import emoji
 data = [0] * 10
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -207,10 +209,27 @@ def stat_functions(df):
    ndf_e = data[7]
    ndf_ew = data[8]
    ndf["Count"] = df["Contents"].str.split().str.len()
-   stats["messageCount"] = ndf.size
+   stats["messageCount"] = len(ndf)
+
+   ndf_n = data[6]
+   stats["indMessageCount"] = ndf_n["Count"].to_list()# pylint: disable=unsubscriptable-object
+
    stats["wordCount"] = ndf["Count"].sum()
+
+   ndf_n = ndf[["Name", "Count"]]
+   ndf_n = ndf.groupby("Name").sum()
+   stats["indWordCount"] = ndf_n["Count"].to_list()
+
    stats["pictureCount"] = ndf["Attachments"].count()
+
+   ndf_n = ndf[["Name", "Attachments"]]
+   ndf_n = ndf_n.groupby("Name").count()
+   stats["indPicCount"] = ndf_n["Attachments"].to_list()
+
    stats["emojiCount"] = ndf_e["Count"].sum() # pylint: disable=unsubscriptable-object
+
+   ndf_n = data[9]
+   stats["indEmojiCount"] = ndf_n["Count"].to_list()# pylint: disable=unsubscriptable-object
 
 
    stats["mostWords"] = ndf_d["Total"].max() # pylint: disable=unsubscriptable-object
@@ -230,29 +249,60 @@ def reassign_df(df):
    ndf = ndf.rename(columns = {"a":"Name"})
    return ndf
 
+colors = ["#2E3440", "#3B4252", "#434C5E", "#D8DEE9", "#E5E9F0", "#ECEFF4", "#88C0D0", "#B48EAD"]
+
 def graph_functions():
+   #nord0, nord1, nord4, nord5, blue, pink
    graphs = {}
-   graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"]) # pylint: disable=maybe-no-member
-   graphs["textsPerDayTrend"] = px.scatter(data[0], x=data[0].index, y=["Kristi", "Leon"], trendline="lowess") # pylint: disable=maybe-no-member
-   graphs["totalTextsPerDay"] = px.bar(data[0], x=data[0].index, y=["Kristi", "Leon"], title="Chart") # pylint: disable=maybe-no-member
+   colorscheme = {"Leon": colors[6], "Kristi": colors[7]}
 
-   graphs["textsPerMonth"] = px.bar(data[1], x=data[1].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
+   graphs["textsPerDay"] = px.line(data[0], x=data[0].index, y=["Kristi", "Leon"], 
+      color_discrete_map=colorscheme, line_shape="spline") # pylint: disable=maybe-no-member
+   graphs["textsPerDay"] = apply_layout(graphs["textsPerDay"])
 
-   graphs["weekDaySent"] = px.bar(data[2], x="Count", y=data[2].index, orientation='h') # pylint: disable=maybe-no-member
 
-   graphs["indWeekDaySent"] = px.bar(data[3], x=data[3].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
+   #graphs["textsPerDayTrend"] = px.scatter(data[0], x=data[0].index, y=["Kristi", "Leon"], trendline="lowess") # pylint: disable=maybe-no-member
+   graphs["totalTextsPerDay"] = px.bar(data[0], x=data[0].index, y=["Kristi", "Leon"], title="Chart",
+      color_discrete_map=colorscheme) # pylint: disable=maybe-no-member
+   graphs["totalTextsPerDay"] = apply_layout(graphs["totalTextsPerDay"])
+   graphs["totalTextsPerDay"].update_layout({"bargap":"0"})
 
-   graphs["hourOfText"] = px.bar(data[4], x=data[4].index, y="Count") # pylint: disable=maybe-no-member
+   #graphs["textsPerMonth"] = px.bar(data[1], x=data[1].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
 
-   graphs["timeOfText"] = px.bar(data[5], x=data[5].index, y="Count") # pylint: disable=maybe-no-member
+   graphs["weekDaySent"] = px.bar(data[2], x="Count", y=data[2].index, orientation='h',
+      color_discrete_map=colorscheme) # pylint: disable=maybe-no-member
+   graphs["weekDaySent"] = apply_layout(graphs["weekDaySent"])
+   #graphs["indWeekDaySent"] = px.bar(data[3], x=data[3].index, y=["Kristi", "Leon"], barmode="group") # pylint: disable=maybe-no-member
 
-   graphs["percentMessages"] = px.pie(data[6], values="Count", names="Name")
+   graphs["hourOfText"] = px.bar(data[4], x=data[4].index, y="Count",
+      color_discrete_map=colorscheme) # pylint: disable=maybe-no-member
+   graphs["hourOfText"] = apply_layout(graphs["hourOfText"])
+   #graphs["timeOfText"] = px.bar(data[5], x=data[5].index, y="Count") # pylint: disable=maybe-no-member
+
+   graphs["percentMessages"] = px.pie(data[6], values="Count", names="Name",
+      color_discrete_map=colorscheme)
+   graphs["percentMessages"] = apply_layout(graphs["percentMessages"])
 
    tt = data[7].head(20) # pylint: disable=maybe-no-member
    graphs["emojiPie"] = px.pie(tt, values="Count", names=tt.index)
-   graphs["emojiFrequency"] = px.bar(data[9], x=["Kristi", "Leon"] , y="Count") # pylint: disable=maybe-no-member
+   graphs["emojiPie"] = apply_layout(graphs["emojiPie"])
+
+   graphs["emojiFrequency"] = px.bar(data[9], x="Count" , y=["Kristi", "Leon"], orientation='h',
+      color_discrete_map=colorscheme) # pylint: disable=maybe-no-member
+   graphs["emojiFrequency"] = apply_layout(graphs["emojiFrequency"])
+
    return graphs
 
+def apply_layout(graph):
+   def_leg = {"bgcolor": colors[2], "title": "Name"}
+   def_layout = {"plot_bgcolor": colors[2], "paper_bgcolor": "rgba(0, 0, 0, 0)", "font_color": colors[3], "legend":def_leg}
+   def_x = {"color": colors[3], "linecolor": colors[3]}
+   def_y = {"color": colors[3], "linecolor": colors[3]}
+
+   graph.update_layout(def_layout)
+   graph.update_xaxes(def_x)
+   graph.update_yaxes(def_y)
+   return graph
 
 # stats["messageCount"] = ndf.size
 #    stats["wordCount"] = ndf["Count"].sum()
@@ -274,7 +324,7 @@ def layout(graphs, stats):
       ]),
 
       html.Div(id="generalStats", className="outerDiv", children=[
-         html.Div(className="innerDiv graphDiv", children=[
+         html.Div(id="percGraphDiv", className="innerDiv graphDiv", children=[
             html.H2("Percentage of messages sent"),
             dcc.Graph(
                id="graph_1",
@@ -282,21 +332,30 @@ def layout(graphs, stats):
             )
          ]),
          
-         html.Div(className="innerDiv", children=[
-            html.H2("Stats"),
-            html.Div(className="divElement statContainer", children=[
-               html.Div(className="divElement generalStat", children=[
-               html.H3(stats["messageCount"])
-               ]),
-               html.Div(className="divElement generalStat", children=[
-                  html.H3(stats["wordCount"])
-               ]),
-               html.Div(className="divElement generalStat", children=[
-                  html.H3(stats["pictureCount"])
-               ]),
-               html.Div(className="divElement generalStat", children=[
-                  html.H3(stats["emojiCount"])
-               ])
+         html.Div(id="percStatsDiv", className="innerDiv", children=[
+            html.Div(className="divElement generalStat", children=[
+               html.H1("✉️"),
+               html.H3(stats["messageCount"]),
+               html.H2(stats["indMessageCount"][0]),
+               html.H2(stats["indMessageCount"][1])
+            ]),
+            html.Div(className="divElement generalStat", children=[
+               html.H1("📄"),
+               html.H3(stats["wordCount"]),
+               html.H2(stats["indWordCount"][0]),
+               html.H2(stats["indWordCount"][1])
+            ]),
+            html.Div(className="divElement generalStat", children=[
+               html.H1("🖼️"),
+               html.H3(stats["pictureCount"]),
+               html.H2(stats["indPicCount"][0]),
+               html.H2(stats["indPicCount"][1])
+            ]),
+            html.Div(className="divElement generalStat", children=[
+               html.H1("🤔"),
+               html.H3(stats["emojiCount"]),
+               html.H2(stats["indEmojiCount"][0]),
+               html.H2(stats["indEmojiCount"][1])
             ])
          ])
       ]),
@@ -317,35 +376,35 @@ def layout(graphs, stats):
          )
       ]),
 
-      html.Div(className="outerDiv", children=[
+      html.Div(id="activeTime",className="outerDiv", children=[
          html.Div(className="innerDiv", children=[
             html.Div(className="divElement", children=[
                html.H3(stats["activeHour"])
             ]),
 
             dcc.Graph(
-               id="graph3",
+               id="graph_4",
                figure = graphs["hourOfText"]
             )
          ]),
          
          html.Div(className="innerDiv", children=[
+            dcc.Graph(
+               id="graph_5",
+               figure = graphs["weekDaySent"]
+            ),
+
             html.Div(className="divElement", children=[
                html.H3(stats["activeDay"])
-            ]),
-
-            dcc.Graph(
-               id="graph5",
-               figure = graphs["weekDaySent"]
-            )
+            ])
          ])
       ]),
 
-      html.Div(className="outerDiv", children=[
-         html.Div(className="separatorDiv", children=[
-            html.Div(className="innerDiv", children=[
+      html.Div(id="emojis", className="outerDiv", children=[
+         html.Div(id="emojiPie", className="innerDiv", children=[
+            html.Div(className="separatorDiv", children=[
                dcc.Graph(
-                  id="graph8",
+                  id="graph_6",
                   figure = graphs["emojiPie"]
                )
             ]),
@@ -358,10 +417,10 @@ def layout(graphs, stats):
             ])
          ]),
 
-         html.Div(className="separatorDiv", children=[
+         html.Div(id="otherThing", className="innerDiv", children=[
             html.H2("w.e"),
             dcc.Graph(
-               id="graph9",
+               id="graph_7",
                figure = graphs["emojiFrequency"]
             ),
          ])
