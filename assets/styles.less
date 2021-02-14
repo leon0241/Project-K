@@ -31,6 +31,13 @@ H1, H2, H3, H4{
       .generalStat{
          display:flex;
          flex-direction: row;
+         flex: 1 1 0;
+         .statLeon{
+            color: @nord8
+         }
+         .statKristi{
+            color: @nord15
+         }
       }
    }
 }
@@ -56,9 +63,10 @@ H1, H2, H3, H4{
    }
    #emojiPie{
       flex-direction: row;
-      .div{
+      div{
+         flex: 1 1 0;
          flex-direction: column;
-         .div{
+         div{
             display: grid;
          }
       }

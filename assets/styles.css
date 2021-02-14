@@ -27,6 +27,13 @@ H4 {
 #generalStats #percStatsDiv .generalStat {
   display: flex;
   flex-direction: row;
+  flex: 1 1 0;
+}
+#generalStats #percStatsDiv .generalStat .statLeon {
+  color: #88C0D0;
+}
+#generalStats #percStatsDiv .generalStat .statKristi {
+  color: #B48EAD;
 }
 #activeTime .innerDiv {
   display: flex;
@@ -46,10 +53,11 @@ H4 {
 #emojis #emojiPie {
   flex-direction: row;
 }
-#emojis #emojiPie .div {
+#emojis #emojiPie div {
+  flex: 1 1 0;
   flex-direction: column;
 }
-#emojis #emojiPie .div .div {
+#emojis #emojiPie div div {
   display: grid;
 }
 #emojis #otherThing {
