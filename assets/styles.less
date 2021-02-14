@@ -22,74 +22,96 @@ H1, H2, H3, H4{
    background-color: @nord1;
 }
 
+.innerDiv{
+   padding: 15px;
+   border-radius: 10px;
+   background-color: @nord2;
+}
+
+section > header{
+   text-align: center;
+}
+
 #generalStats{
-   flex-direction: row;
-   #percGraphDiv{
+   flex-direction: column;
+
+   main{
       display: flex;
-      flex-direction: column;
-      flex: 1 1 0;
-   }
-   #percStatsDiv{
-      display: flex;
-      flex: 1 1 0;
-      flex-direction: column;
-      justify-content: space-evenly;
-         .generalStat{
+      flex-direction: row;
+      #percentPie{
+         display: flex;
+         flex-direction: column;
+         flex: 1 1 0;
+      }
+
+      #percentStats{
+         background-color: @nord2;
+         display: flex;
+         flex: 1 1 0;
+         flex-direction: column;
+         justify-content: space-evenly;
+         .statList{
             display: grid;
             grid-template-columns: 10% 35% 15% auto 15%;
-         }
-         .statLeon{
+   
+            .statLeon{
             color: @nord8
-         }
-         .statKristi{
+            }
+   
+            .statKristi{
             color: @nord15
-         }
-
-         .gridItem{
-            align-self: center;
-            justify-self: center;
-         }
-
-         .percentBar{
-            height: 69%;
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-
-            .barLeon{
-               height: 100%;
-               width: var(--size);
-               background-color: @nord8;
             }
-
-            .barKristi{
-               height: 100%;
-               width: var(--size);
-               background-color: @nord15;
+   
+            .gridItem{
+               align-self: center;
+               justify-self: center;
+            }
+   
+            .statBar{
+               height: 69%;
+               width: 100%;
+               display: flex;
+               flex-direction: row;
+      
+               .barLeon{
+                  height: 100%;
+                  width: var(--size);
+                  background-color: @nord8;
+               }
+      
+               .barKristi{
+                  height: 100%;
+                  width: var(--size);
+                  background-color: @nord15;
+               }
             }
          }
+      }
    }
 }
 
 #perDay{
-   .innerDiv{
-      display: flex;
-      flex-direction: row;
-      margin:0 60px;
-      .divElement{
+   display: flex;
+   flex-direction: column;
+   main{
+      #perDayStats{
          display: flex;
-         flex: 1 1 0;
-         align-items: center;
-         justify-content: center;
-         background-color: 
-         @nord2;
+         flex-direction: row;
          margin:0 60px;
-         border-radius: 20px;
-         .centerDiv{
-            padding-top: 10px;
-            padding-bottom: 10px;
-            h3{
-               margin: 0;
+         section{
+            display: flex;
+            flex: 1 1 0;
+            align-items: center;
+            justify-content: center;
+            background-color: 
+            @nord2;
+            margin:0 60px;
+            .centerDiv{
+               padding-top: 10px;
+               padding-bottom: 10px;
+               h3{
+                  margin: 0;
+               }
             }
          }
       }
@@ -97,21 +119,26 @@ H1, H2, H3, H4{
 }
 
 #activeTime{
-   .innerDiv{
-      display: flex;
-      flex-direction: row;
-      height: 400px;
-      #graph_4, #graph_5{
-         flex: 2 1 0;
-      }
-      .divElement{
+   display: flex;
+   flex-direction: column;
+   main{
+      section{
          display: flex;
-         flex-direction: column;
-         flex: 1 1 0;
-         align-items: center;
-         justify-content: center;
-         H2{
+         flex-direction: row;
+         height: 400px;
+         #graph_4, #graph_5{
+            flex: 2 1 0;
+         }
+         .innerDiv{
             display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            H2{
+               display: flex;
+            }
          }
       }
    }

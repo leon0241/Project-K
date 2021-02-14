@@ -211,10 +211,10 @@ def stat_functions(df):
    ndf_e = data[7]
    ndf_ew = data[8]
    ndf["Count"] = df["Contents"].str.split().str.len()
-   stats["MsgCount"] = len(ndf)
+   stats["msgCount"] = len(ndf)
 
    ndf_n = data[6]
-   stats["indMsgCount"] = ndf_n["Count"].to_list()# pylint: disable=unsubscriptable-object
+   stats["indmsgCount"] = ndf_n["Count"].to_list()# pylint: disable=unsubscriptable-object
 
    stats["wordCount"] = round(ndf["Count"].sum())
 
@@ -245,7 +245,7 @@ def stat_functions(df):
    stats["activeDay"] = ndf_wd["Count"].idxmax() # pylint: disable=unsubscriptable-object
    return stats
 
-   #print(MsgCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
+   #print(msgCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
    # 462156 400031.0 1192 1403 2020-09-21 00:00:00 472.55214723926383 5.235939320165967 13326
 
 def reassign_df(df):
@@ -325,179 +325,148 @@ def apply_layout(graph):
    graph.update_traces(def_trace)
    return graph
 
+def generate_row(emoji, count, message, indCount):
+   strCount = str(count)
+   strInd = [str(indCount[0]), str(indCount[1])]
+
+   return html.Div(className="statList", children=[
+      html.H2(className="gridItem statEmoji", children=[emoji]),
+               
+      html.H2(className="gridItem statMain", children=[
+         html.Span(className="highlight", children=[strCount]),
+         message
+      ]),
+
+      html.H3(className="gridItem statLeon", children=[
+         strInd[0]
+      ]),
+
+      html.Div(className="gridItem statBar", children=[
+         html.Div(className="barLeon", style={
+            "--size":(str(indCount[0] / count * 100) + "%")}
+         ),
+         html.Div(className="barKristi", style={
+            "--size":(str(indCount[1] / count * 100) + "%")}
+         )
+      ]),
+
+      html.H3(className="gridItem statKristi", children=[
+         strInd[1]
+      ])
+   ])
+
 def layout(graphs, stats):
    app.layout = html.Div(id="pageDiv", children=[
-      html.Div(id="header", className="outerDiv", children=[
+      html.Header(className="outerDiv", children=[
          html.H1("Our message analysis"),
          html.H2("Messages extracted using Discord Data package."
          "Messages from 30/07/2020 to 08/01/2021 (because Discord won't give me the rest of the data)")
       ]),
 
-      html.Div(id="generalStats", className="outerDiv", children=[
-         html.Div(id="percGraphDiv", className="innerDiv graphDiv", children=[
-            html.H2("Percentage of messages sent"),
-            dcc.Graph(
-               id="graph_1",
-               figure = graphs["percentMessages"]
-            )
+      html.Section(id="generalStats", className="outerDiv", children=[
+         html.Header([
+            html.H2("Who texts the most?"),
          ]),
-         
-         html.Div(id="percStatsDiv", className="innerDiv", children=[
-            html.Div(className="divElement generalStat", children=[
-               html.H2(className="gridItem statEmoji", children=["✉️"]),
-               
-               html.H2(className="gridItem statMain", children=[
-                  html.Span(className="highlight", children=[
-                     str(stats["MsgCount"])]),
-                  " Messages"]),
 
-               html.H3(className="gridItem statLeon", children=[
-                  str(stats["indMsgCount"][0])]),
-
-               html.Div(className="gridItem percentBar", children=[
-                  html.Div(className="barLeon", style={
-                     "--size":(str(stats["indMsgCount"][0] / stats["MsgCount"] * 100) + "%")}),
-                  html.Div(className="barKristi", style={
-                     "--size":(str(stats["indMsgCount"][1] / stats["MsgCount"] * 100) + "%")})
-               ]),
-
-               html.H3(className="gridItem statKristi", children=[
-                  str(stats["indMsgCount"][1])])
+         html.Main([
+            html.Section(id="percentPie", children=[
+               dcc.Graph(
+                  id="graph_1",
+                  figure = graphs["percentMessages"]
+               )
             ]),
-            html.Div(className="divElement generalStat", children=[
-               html.H2(className="gridItem statEmoji", children=["📄"]),
 
-               html.H2(className="gridItem statMain", children=[
-                  html.Span(className="highlight", children=[
-                     str(stats["wordCount"])]),
-                  " Words"]),
-
-               html.H3(className="gridItem statLeon", children=[
-                  str(stats["indWordCount"][0])]),
-
-               html.Div(className="gridItem percentBar", children=[
-                  html.Div(className="barLeon", style={
-                     "--size":(str(stats["indWordCount"][0] / stats["wordCount"] * 100) + "%")}),
-                  html.Div(className="barKristi", style={
-                     "--size":(str(stats["indWordCount"][1] / stats["wordCount"] * 100) + "%")})
-               ]),
-
-               html.H3(className="gridItem statKristi", children=[
-                  str(stats["indWordCount"][1])])
-            ]),
-            html.Div(className="divElement generalStat", children=[
-               html.H2(className="gridItem statEmoji", children=["🖼️"]),
-
-               html.H2(className="gridItem statMain", children=[
-                  html.Span(className="highlight", children=[
-                     str(stats["pictureCount"])]),
-                  " Pictures"]),
-
-               html.H3(className="gridItem statLeon", children=[
-                  str(stats["indPicCount"][0])]),
-
-               html.Div(className="gridItem percentBar", children=[
-                  html.Div(className="barLeon", style={
-                     "--size":(str(stats["indPicCount"][0] / stats["pictureCount"] * 100) + "%")}),
-                  html.Div(className="barKristi", style={
-                     "--size":(str(stats["indPicCount"][1] / stats["pictureCount"] * 100) + "%")})
-               ]),
-
-               html.H3(className="gridItem statKristi", children=[
-                  str(stats["indPicCount"][1])])
-            ]),
-            html.Div(className="divElement generalStat", children=[
-               html.H2(className="gridItem statEmoji", children=["🤔"]),
-
-               html.H2(className="gridItem statMain", children=[
-                  html.Span(className="highlight", children=[str(stats["emojiCount"])]),
-                  " Emojis"]),
-
-               html.H3(className="gridItem statLeon", children=[
-                  str(stats["indEmojiCount"][0])]),
-
-               html.Div(className="gridItem percentBar", children=[
-                  html.Div(className="barLeon", style={
-                     "--size":(str(stats["indEmojiCount"][0] / stats["emojiCount"] * 100) + "%")}),
-                  html.Div(className="barKristi", style={
-                     "--size":(str(stats["indEmojiCount"][1] / stats["emojiCount"] * 100) + "%")})
-               ]),
-
-               html.H3(className="gridItem statKristi", children=[
-                  str(stats["indEmojiCount"][1])])
+            html.Section(id="percentStats", className="innerDiv", children=[
+               generate_row("✉️", stats["msgCount"], " messages",  stats["indmsgCount"]),
+               generate_row("📄", stats["wordCount"], " words",  stats["indWordCount"]),
+               generate_row("🖼️", stats["pictureCount"], " pictures",  stats["indPicCount"]),
+               generate_row("🤔", stats["emojiCount"], " emojis",  stats["indEmojiCount"])
             ])
          ])
       ]),
 
-      html.Div(id="perDay", className="outerDiv", children=[
-         html.H2("Number of messages per day"),
-
-         dcc.Graph(
-            id="graph_2",
-            figure = graphs["textsPerDay"]
-         ),
-         html.Div(className="innerDiv", children=[
-            html.Div(id="textLeft", className="divElement", children=[
-               html.Div(className="centerDiv", children=[
-                  html.H3(className="", children=[
-                  "We text an average of ",
-                  html.Span(className="highlight", children=[
-                     str(round(stats["avgMsgs"]))]),
-                     " messages per day",
-                     html.Br(),
-                  "That's around 20 a messages an hour!"]),
-               ])
-            ]),
-
-            html.Div(id="textRight", className="divElement", children=[
-               html.Div(className="centerDiv", children=[
-                  html.H3(className="", children=[
-                  "Our busiest day was ",
-                  html.Span(className="highlight", children=[
-                     str(stats["mostWordsDate"])[0:10]]), ", ",
-                  html.Br(),
-                  "where we sent ",
-                  html.Span(className="highlight", children=[
-                     str(stats["mostWords"])]),
-                  " messages",
-                  html.Br(),
-                  "That's around 58 a messages an hour!"]),
-               ])
-            ])
+      html.Section(id="perDay", className="outerDiv", children=[
+         html.Header([
+            html.H2("Number of messages per day"),
          ]),
-         
 
-         dcc.Graph(
-            id="graph_3",
-            figure = graphs["totalTextsPerDay"]
-         )
-      ]),
-
-      html.Div(id="activeTime",className="outerDiv", children=[
-         html.Div(className="innerDiv", children=[
-            html.Div(className="divElement", children=[
-               html.H2("Our most active hour of the day is:"),
-
-               html.H1(className="highlight", children=[
-                  str(stats["activeHour"])[11:16]])
-            ]),
-
+         html.Main([
             dcc.Graph(
-               id="graph_4",
-               figure = graphs["hourOfText"]
-            )
-         ]),
-         
-         html.Div(className="innerDiv", children=[
-            dcc.Graph(
-               id="graph_5",
-               figure = graphs["weekDaySent"]
+               id="graph_2",
+               figure = graphs["textsPerDay"]
             ),
 
-            html.Div(className="divElement", children=[
-               html.H2("Our most active day of the week is: "),
-               html.H1(className="highlight", children=[
-                  stats["activeDay"]])
+            html.Section(id="perDayStats", children=[
+               html.Section(className="innerDiv", children=[
+                  html.Div(className="centerDiv", children=[
+                     html.H3(className="", children=[
+                     "We text an average of ",
+                     html.Span(className="highlight", children=[
+                        str(round(stats["avgMsgs"]))]),
+                     " messages per day",
+                     html.Br(),
+                     "That's around 20 a messages an hour!"]),
+                  ])
+               ]),
+
+               html.Section(className="innerDiv", children=[
+                  html.Div(className="centerDiv", children=[
+                     html.H3(className="", children=[
+                        "Our busiest day was ",
+                        html.Span(className="highlight", children=[
+                           str(stats["mostWordsDate"])[0:10]]), ", ",
+                        html.Br(),
+                        "where we sent ",
+                        html.Span(className="highlight", children=[
+                           str(stats["mostWords"])]),
+                        " messages",
+                        html.Br(),
+                        "That's around 58 a messages an hour!"
+                     ]),
+                  ])
+               ])
+            ]),
+
+            dcc.Graph(
+               id="graph_3",
+               figure = graphs["totalTextsPerDay"]
+            )
+         ])
+      ]),
+      
+      html.Section(id="activeTime", className="outerDiv", children=[
+         html.Header([
+            html.H2("When do we text the most?"),
+         ]),
+
+         html.Main([
+            html.Section([
+               html.Div(className="innerDiv", children=[
+                  html.H2("Our most active hour of the day is:"),
+
+                  html.H1(className="highlight", children=[
+                     str(stats["activeHour"])[11:16]
+                  ])
+               ]),
+
+               dcc.Graph(
+                  id="graph_4",
+                  figure = graphs["hourOfText"]
+               )
+            ]),
+
+            html.Section([
+               dcc.Graph(
+                  id="graph_5",
+                  figure = graphs["weekDaySent"]
+               ),
+
+               html.Div(className="innerDiv", children=[
+                  html.H2("Our most active day of the week is: "),
+                  html.H1(className="highlight", children=[
+                     stats["activeDay"]
+                  ])
+               ])
             ])
          ])
       ]),

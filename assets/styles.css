@@ -19,88 +19,109 @@ H4 {
   margin: 15px 30px;
   background-color: #3B4252;
 }
+.innerDiv {
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #434C5E;
+}
+section > header {
+  text-align: center;
+}
 #generalStats {
+  flex-direction: column;
+}
+#generalStats main {
+  display: flex;
   flex-direction: row;
 }
-#generalStats #percGraphDiv {
+#generalStats main #percentPie {
   display: flex;
   flex-direction: column;
   flex: 1 1 0;
 }
-#generalStats #percStatsDiv {
+#generalStats main #percentStats {
+  background-color: #434C5E;
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
   justify-content: space-evenly;
 }
-#generalStats #percStatsDiv .generalStat {
+#generalStats main #percentStats .statList {
   display: grid;
   grid-template-columns: 10% 35% 15% auto 15%;
 }
-#generalStats #percStatsDiv .statLeon {
+#generalStats main #percentStats .statList .statLeon {
   color: #88C0D0;
 }
-#generalStats #percStatsDiv .statKristi {
+#generalStats main #percentStats .statList .statKristi {
   color: #B48EAD;
 }
-#generalStats #percStatsDiv .gridItem {
+#generalStats main #percentStats .statList .gridItem {
   align-self: center;
   justify-self: center;
 }
-#generalStats #percStatsDiv .percentBar {
+#generalStats main #percentStats .statList .statBar {
   height: 69%;
   width: 100%;
   display: flex;
   flex-direction: row;
 }
-#generalStats #percStatsDiv .percentBar .barLeon {
+#generalStats main #percentStats .statList .statBar .barLeon {
   height: 100%;
   width: var(--size);
   background-color: #88C0D0;
 }
-#generalStats #percStatsDiv .percentBar .barKristi {
+#generalStats main #percentStats .statList .statBar .barKristi {
   height: 100%;
   width: var(--size);
   background-color: #B48EAD;
 }
-#perDay .innerDiv {
+#perDay {
+  display: flex;
+  flex-direction: column;
+}
+#perDay main #perDayStats {
   display: flex;
   flex-direction: row;
   margin: 0 60px;
 }
-#perDay .innerDiv .divElement {
+#perDay main #perDayStats section {
   display: flex;
   flex: 1 1 0;
   align-items: center;
   justify-content: center;
   background-color: #434C5E;
   margin: 0 60px;
-  border-radius: 20px;
 }
-#perDay .innerDiv .divElement .centerDiv {
+#perDay main #perDayStats section .centerDiv {
   padding-top: 10px;
   padding-bottom: 10px;
 }
-#perDay .innerDiv .divElement .centerDiv h3 {
+#perDay main #perDayStats section .centerDiv h3 {
   margin: 0;
 }
-#activeTime .innerDiv {
+#activeTime {
+  display: flex;
+  flex-direction: column;
+}
+#activeTime main section {
   display: flex;
   flex-direction: row;
   height: 400px;
 }
-#activeTime .innerDiv #graph_4,
-#activeTime .innerDiv #graph_5 {
+#activeTime main section #graph_4,
+#activeTime main section #graph_5 {
   flex: 2 1 0;
 }
-#activeTime .innerDiv .divElement {
+#activeTime main section .innerDiv {
   display: flex;
   flex-direction: column;
   flex: 1 1 0;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
-#activeTime .innerDiv .divElement H2 {
+#activeTime main section .innerDiv H2 {
   display: flex;
 }
 #emojis .innerDiv {
