@@ -32,6 +32,13 @@ section > header{
    text-align: center;
 }
 
+#title{
+   text-align: center;
+   H1{
+      
+   }
+}
+
 #generalStats{
    flex-direction: column;
 
@@ -136,30 +143,37 @@ section > header{
             align-items: center;
             justify-content: center;
             padding: 0;
-            H2{
-               display: flex;
-            }
          }
       }
    }
 
 }
 
-#emojis{
-   .innerDiv{
+#emoji{
+   display: flex;
+   flex-direction: column;
+   main{
       display: flex;
-   }
-   #emojiPie{
       flex-direction: row;
-      div{
-         flex: 1 1 0;
-         flex-direction: column;
+
+      #emojiPie{
+         flex: 3 1 0;
+         
          div{
-            display: grid;
+            display: flex;
+            justify-content: center;
+            img{
+               height: 100%;
+               width: auto
+            }
          }
       }
-   }
-   #otherThing{
-      flex-direction: column;
+
+      #emojiFreq{
+         flex: 2 1 0;
+         H2{
+            text-align: center;
+         }
+      }
    }
 }
