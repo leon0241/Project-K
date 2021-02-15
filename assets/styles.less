@@ -12,6 +12,11 @@ H1, H2, H3, H4{
    color: @nord13;
 }
 
+.divider{
+   width: 50%;
+   border-top: 3px solid @nord5
+}
+
 .outerDiv{
    display: flex;
    flex-direction: column;
@@ -30,12 +35,16 @@ H1, H2, H3, H4{
 
 section > header{
    text-align: center;
+   color: @nord5
 }
 
 #title{
    text-align: center;
    H1{
-      
+      color: @nord6;
+   }
+   H4{
+      color: @nord5;
    }
 }
 
@@ -174,6 +183,15 @@ section > header{
          H2{
             text-align: center;
          }
+      }
+   }
+}
+
+footer{
+   section{
+      H5, H6{
+         color: @nord4;
+         text-align: center;
       }
    }
 }

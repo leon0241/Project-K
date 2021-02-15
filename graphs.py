@@ -14,6 +14,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+config = {'displayModeBar': False}
 # Initialise dataframe
 def initialise_dataframe():
    df = pd.read_csv("Data/sortedData6M.csv")
@@ -240,9 +241,13 @@ def stat_functions(df):
    stats["mostWordsDate"] = ndf_d["Total"].idxmax() # pylint: disable=unsubscriptable-object
    stats["avgMsgs"] = ndf_d["Total"].mean() # pylint: disable=unsubscriptable-object
    stats["avgMsgsLen"] = ndf["Count"].mean()
-   stats["mostUsedEmoji"] = ndf_ew["Total"].idxmax() # pylint: disable=unsubscriptable-object
    stats["activeHour"] = ndf_t["Count"].idxmax() # pylint: disable=unsubscriptable-object
+   stats["activeHourCount"] = ndf_t["Count"].max()# pylint: disable=unsubscriptable-object
    stats["activeDay"] = ndf_wd["Count"].idxmax() # pylint: disable=unsubscriptable-object
+   stats["activeDayCount"] = ndf_wd["Count"].max()# pylint: disable=unsubscriptable-object
+
+   stats["mostUsedEmoji"] = ndf_ew["Total"].idxmax() # pylint: disable=unsubscriptable-object
+
    return stats
 
    #print(msgCount, wordCount, pictureCount, mostWords, mostWordsDate, avgMsgs, avgMsgsLen)
@@ -296,15 +301,16 @@ def graph_functions():
 
    tt = data[8].head(20) # pylint: disable=maybe-no-member
    #graphs["emojiPie"] = px.pie(tt, values="Count", names=tt.index, color=tt.index,color_discrete_sequence=px.colors.sequential.Sunsetdark)
-   graphs["emojiPie"] = px.bar(tt, x=tt.index, y="Total", color=tt.index,
-   color_discrete_sequence=[colors[9]])
+   graphs["emojiPie"] = px.bar(tt, x=tt.index, y=["Leon", "Kristi"], 
+   color_discrete_map=colorscheme)
    graphs["emojiPie"] = apply_layout(graphs["emojiPie"])
    graphs["emojiPie"].update_layout(
-      showlegend = False
+      showlegend = False,
+      xaxis={"tickfont_size": 23},
+      yaxis={"title_text":"Count"}
    )
 
-   graphs["emojiFrequency"] = px.bar(data[9], x="Count" , y=["Kristi", "Leon"], orientation='h',
-      color_discrete_sequence=[colors[9]]) # pylint: disable=maybe-no-member
+   graphs["emojiFrequency"] = px.pie(data[9], values="Count" , names=data[9].index, color=data[9].index, color_discrete_map=colorscheme) # pylint: disable=maybe-no-member
    graphs["emojiFrequency"] = apply_layout(graphs["emojiFrequency"])
 
    return graphs
@@ -357,10 +363,10 @@ def generate_row(emoji, count, message, indCount):
 
 def layout(graphs, stats):
    app.layout = html.Div(id="pageDiv", children=[
-      html.Header(className="outerDiv", children=[
-         html.H1("Our message analysis"),
-         html.H2("Messages extracted using Discord Data package."
-         "Messages from 30/07/2020 to 08/01/2021 (because Discord won't give me the rest of the data)")
+      html.Header(id="title", className="outerDiv", children=[
+         html.H1("Our half-year in review"),
+         html.Hr(className="divider"),
+         html.H4("A visual representation of our message data from 30/07/2020 to 08/01/2021 (discord won't give me the rest)")
       ]),
 
       html.Section(id="generalStats", className="outerDiv", children=[
@@ -387,7 +393,7 @@ def layout(graphs, stats):
 
       html.Section(id="perDay", className="outerDiv", children=[
          html.Header([
-            html.H2("Number of messages per day"),
+            html.H2("How often do we text?"),
          ]),
 
          html.Main([
@@ -442,11 +448,19 @@ def layout(graphs, stats):
          html.Main([
             html.Section([
                html.Div(className="innerDiv", children=[
-                  html.H2("Our most active hour of the day is:"),
-
-                  html.H1(className="highlight", children=[
-                     str(stats["activeHour"])[11:16]
-                  ])
+                  html.H2(["Our most active hour of the day",
+                     html.Br(),
+                     "is ",
+                     html.Span(className="highlight", children=[
+                        str(stats["activeHour"])[11:16]
+                     ]),
+                     ", with a total of ",
+                     html.Br(),
+                     html.Span(className="highlight", children=[
+                        str(stats["activeHourCount"])
+                     ]),
+                     " messages."
+                  ]),
                ]),
 
                dcc.Graph(
@@ -462,33 +476,44 @@ def layout(graphs, stats):
                ),
 
                html.Div(className="innerDiv", children=[
-                  html.H2("Our most active day of the week is: "),
-                  html.H1(className="highlight", children=[
-                     stats["activeDay"]
-                  ])
+                  html.H2(["Our most active day of the week",
+                     html.Br(),
+                     "is ",
+                     html.Span(className="highlight", children=[
+                        stats["activeDay"]
+                     ]),
+                     ", with a total of ",
+                     html.Br(),
+                     html.Span(className="highlight", children=[
+                        str(stats["activeDayCount"])
+                     ]),
+                     " messages."
+                  ]),
+                  
                ])
             ])
          ])
       ]),
 
-      html.Div(id="emojis", className="outerDiv", children=[
-         html.Div(id="emojiPie", className="innerDiv", children=[
-            html.Div(className="separatorDiv", children=[
+      html.Section(id="emoji", className="outerDiv", children=[
+         html.Header([
+            html.H2("Top emojis")
+         ]),
+
+         html.Main([
+            html.Section(id="emojiPie", children=[
+               html.Div([
+                  html.Img(src=app.get_asset_url('kristi.png')),
+               ]),
+               
                dcc.Graph(
                   id="graph_6",
                   figure = graphs["emojiPie"]
                )
             ]),
 
-            html.Div(children=[
-               html.H2("Top emojis"),
-               html.Div(children=[
-                  html.H2(stats["mostUsedEmoji"])
-               ])
-            ]),
-
-            html.Div(id="otherThing", className="innerDiv", children=[
-               html.H2("w.e"),
+            html.Section(id="emojiFreq", children=[
+               html.H2("lol"),
                dcc.Graph(
                   id="graph_7",
                   figure = graphs["emojiFrequency"]
@@ -497,9 +522,15 @@ def layout(graphs, stats):
          ])
       ]),
 
-      # html.Script([
-      #    "alert('test')"
-      #    ])
+      html.Footer(id="footer", className="outerDiv", children=[
+         html.Section([
+            html.H5("Thank you for all the messages and time spent chatting. These past months really wouldn't be the same without you. Here's hoping we can continue this through University and everything else that happens. Happy Valentine's, I love you Kristi :)")
+         ]),
+         html.Hr(className="divider"),
+         html.Section([
+            html.H6("Data extracted from Discord's Data package. Data visualised using Plotly and Dash.")
+         ])
+      ])
    ])
 
 def main():
@@ -517,7 +548,7 @@ def main():
 
 if __name__ == "__main__":
    main()
-   app.run_server(debug=True)
+   app.run_server(debug=False)
 
 
 # print(loc[0,:])

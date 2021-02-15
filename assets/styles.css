@@ -10,6 +10,10 @@ H4 {
 .highlight {
   color: #EBCB8B;
 }
+.divider {
+  width: 50%;
+  border-top: 3px solid #E5E9F0;
+}
 .outerDiv {
   display: flex;
   flex-direction: column;
@@ -26,6 +30,16 @@ H4 {
 }
 section > header {
   text-align: center;
+  color: #E5E9F0;
+}
+#title {
+  text-align: center;
+}
+#title H1 {
+  color: #ECEFF4;
+}
+#title H4 {
+  color: #E5E9F0;
 }
 #generalStats {
   flex-direction: column;
@@ -121,22 +135,33 @@ section > header {
   justify-content: center;
   padding: 0;
 }
-#activeTime main section .innerDiv H2 {
+#emoji {
   display: flex;
+  flex-direction: column;
 }
-#emojis .innerDiv {
+#emoji main {
   display: flex;
-}
-#emojis #emojiPie {
   flex-direction: row;
 }
-#emojis #emojiPie div {
-  flex: 1 1 0;
-  flex-direction: column;
+#emoji main #emojiPie {
+  flex: 3 1 0;
 }
-#emojis #emojiPie div div {
-  display: grid;
+#emoji main #emojiPie div {
+  display: flex;
+  justify-content: center;
 }
-#emojis #otherThing {
-  flex-direction: column;
+#emoji main #emojiPie div img {
+  height: 100%;
+  width: auto;
+}
+#emoji main #emojiFreq {
+  flex: 2 1 0;
+}
+#emoji main #emojiFreq H2 {
+  text-align: center;
+}
+footer section H5,
+footer section H6 {
+  color: #D8DEE9;
+  text-align: center;
 }
