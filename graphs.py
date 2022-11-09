@@ -524,7 +524,7 @@ def layout(graphs, stats):
 
       html.Footer(id="footer", className="outerDiv", children=[
          html.Section([
-            html.H5("Thank you for all the messages and time spent chatting. These past months really wouldn't be the same without you. Here's hoping we can continue this through University and everything else that happens. Happy Valentine's, I love you Kristi :)")
+            html.H5("To be continued....")
          ]),
          html.Hr(className="divider"),
          html.Section([
